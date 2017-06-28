@@ -7,6 +7,7 @@ Environment: MacOS, 4G RAM
 Database: MongoDB
 Install MongoDB and start without configuration
 Install Python dependent modules：Scrapy, pymongo, requests or pip install -r requirements.txt
+must download chromedriver and modify webdriver variable
 # Run
 cd SearchActivity
 python quickstart.py
