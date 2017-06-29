@@ -34,6 +34,7 @@ class Spider(CrawlSpider):
         self.waiting_list = []
         self.finish_list = []
         self.driver = web_driver
+        self.driver.set_page_load_timeout(5)
 
     def __del__(self):
         if self.driver is not None:
