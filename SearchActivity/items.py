@@ -9,3 +9,4 @@ class ActivityItem(Item):
     link_url = Field()
     website = Field()
     valid = Field()
+    price = Field()

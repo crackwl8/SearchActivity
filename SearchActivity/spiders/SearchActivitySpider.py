@@ -34,7 +34,8 @@ class Spider(CrawlSpider):
         self.waiting_list = []
         self.finish_list = []
         self.driver = web_driver
-        self.driver.set_page_load_timeout(5)
+        self.driver.set_page_load_timeout(20)
+        self.driver.set_script_timeout(5)
 
     def __del__(self):
         if self.driver is not None:
@@ -44,8 +45,8 @@ class Spider(CrawlSpider):
     def start_requests(self):
         hosts = [
                  {'url': 'https://www.tmall.com', 'call_back': self.parse_tmall_key},
-                 {'url': 'https://www.jd.com', 'call_back': self.parse_jd_key},
-                 {'url': 'https://www.amazon.cn', 'call_back': self.parse_amazon_key},
+                 # {'url': 'https://www.jd.com', 'call_back': self.parse_jd_key},
+                 # {'url': 'https://www.amazon.cn', 'call_back': self.parse_amazon_key},
                 ]
         for host in hosts:
             self.waiting_list.append(host['url'])
@@ -57,17 +58,28 @@ class Spider(CrawlSpider):
         try:
             self.waiting_list.remove(response.url)
         except ValueError:
-            # logging.debug(self.waiting_list)
+            # logging.error(self.waiting_list)
             pass
         self.finish_list.append(response.url)
         logging.debug(
             ' request url callback:----->' + response.url + ' waiting %s finished %s' % (len(self.waiting_list), len(self.finish_list)))
-        self.driver.get(response.url)
-        selector = Selector(text=self.driver.page_source)
+        try:
+            self.driver.get(response.url)
+            selector = Selector(text=self.driver.page_source)
+        except Exception as exc:
+            logging.error(exc)
+            self.driver.quit()
+            self.driver = webdriver.Chrome("/Users/wulei/Downloads/chromedriver")
+            # self.driver.execute_script('window.stop()')
+            pass
         # logging.info(selector)
         # divs = selector.xpath('//div[@class="tm-fcs-panel"]/dl[@class="tm-promo-panel"]/dd/div[@class="tm-promo-price"]')
         viewkey = None
+        price = 0
         if 'detail.tmall.com' in response.url:
+            prices = selector.css('.tm-price::text').extract()
+            if prices and len(prices) > 0:
+                price = prices[0]
             divs = selector.css('.tm-promo-type')
             for div in divs:
                 for desc in TMALL_DESC:
@@ -75,7 +87,7 @@ class Spider(CrawlSpider):
                     if viewkey:
                         break
         if viewkey:
-            yield self.parse_tmall_info(response)
+            yield self.parse_tmall_info(response, price)
         url_next = selector.xpath(
             '//a/@href').extract()
         # logging.debug(len(url_next))
@@ -96,7 +108,7 @@ class Spider(CrawlSpider):
                 yield Request(url=url,
                               callback=self.parse_tmall_key, errback=self.parse_err)
 
-    def parse_tmall_info(self, response):
+    def parse_tmall_info(self, response, price):
         actItem = ActivityItem()
         selector = Selector(response)
         _ph_info = selector.xpath('//title/text()').extract()
@@ -108,7 +120,8 @@ class Spider(CrawlSpider):
         actItem['link_url'] = link_url
         actItem['website'] = 'tmall'
         actItem['valid'] = True
-        logging.debug(' title:%s link_url:%s' % (title, link_url))
+        actItem['price'] = float(price)
+        logging.debug(' title:%s link_url:%s price:%s' % (title, link_url, price))
         return actItem
 
     def parse_jd_key(self, response):
@@ -121,8 +134,13 @@ class Spider(CrawlSpider):
         self.finish_list.append(response.url)
         logging.debug(
             ' request url callback:----->' + response.url + ' waiting %s finished %s' % (len(self.waiting_list), len(self.finish_list)))
-        self.driver.get(response.url)
-        selector = Selector(text=self.driver.page_source)
+        try:
+            self.driver.get(response.url)
+            selector = Selector(text=self.driver.page_source)
+        except Exception as exc:
+            logging.error(exc)
+            # self.driver.execute_script('window.stop()')
+            pass
         # logging.info(selector)
         # divs = selector.xpath('//div[@class="tm-fcs-panel"]/dl[@class="tm-promo-panel"]/dd/div[@class="tm-promo-price"]')
         viewkey = None
@@ -180,8 +198,13 @@ class Spider(CrawlSpider):
         self.finish_list.append(response.url)
         logging.debug(
             ' request url callback:----->' + response.url + ' waiting %s finished %s' % (len(self.waiting_list), len(self.finish_list)))
-        self.driver.get(response.url)
-        selector = Selector(text=self.driver.page_source)
+        try:
+            self.driver.get(response.url)
+            selector = Selector(text=self.driver.page_source)
+        except Exception as exc:
+            logging.error(exc)
+            # self.driver.execute_script('window.stop()')
+            pass
         # logging.info(selector)
         # divs = selector.xpath('//div[@class="tm-fcs-panel"]/dl[@class="tm-promo-panel"]/dd/div[@class="tm-promo-price"]')
         viewkey = None

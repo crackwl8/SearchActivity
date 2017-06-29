@@ -20,6 +20,9 @@ TMALL_DESC = [
     u'抢购价',
     u'促销价',
     u'卖家优惠',
+    u'特惠',
+    u'聚划算',
+    u'抢',
 ]
 
 TMALL_EXCEPT_DOMAIN = [
@@ -27,6 +30,7 @@ TMALL_EXCEPT_DOMAIN = [
     'b.tmall.com',
     'login.tmall.com',
     'login.taobao.com',
+    'err.taobao.com',
     'register.tmall.com',
     'vip.tmall.com',
     'service.tmall.com',
@@ -41,6 +45,7 @@ TMALL_EXCEPT_DOMAIN = [
     'mymy.maowo.tmall.com',
     'guize.tmall.com',
     'peixun.tmall.com',
+    'e56.tmall.com',
 ]
 
 JD_DESC = [
@@ -65,6 +70,7 @@ JD_EXCEPT_DOMAIN = [
     'game.jd.com',
     'movie.jd.com',
     'zhaopin.jd.com',
+    'jr.jd.com',
 ]
 
 AMAZON_DESC = [
