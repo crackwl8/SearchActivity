@@ -20,7 +20,7 @@ class SearchActivityMongoDBPipeline(object):
         #         print 'delete %s %d times ' % (url, i)
         #         # 注意后面的参数， 很奇怪，在mongo命令行下，它为1时，是删除一个元素，这里却是为0时删除一个
         #         db.activity.remove({"title": url}, 0)
-        db.activity.create_index([("title", pymongo.ASCENDING)], background = True, unique=True)
+        db.activity.create_index([("title", pymongo.ASCENDING)], background=True, unique=True)
         self.Res = db.activity
 
     def process_item(self, item, spider):

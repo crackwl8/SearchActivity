@@ -45,8 +45,8 @@ class Spider(CrawlSpider):
     def start_requests(self):
         hosts = [
                  {'url': 'https://www.tmall.com', 'call_back': self.parse_tmall_key},
-                 # {'url': 'https://www.jd.com', 'call_back': self.parse_jd_key},
-                 # {'url': 'https://www.amazon.cn', 'call_back': self.parse_amazon_key},
+                 {'url': 'https://www.jd.com', 'call_back': self.parse_jd_key},
+                 {'url': 'https://www.amazon.cn/gp/product/B00VLYDAKQ/ref=s9_acss_bw_cg_dotd_2a1_w?pf_rd_m=A1U5RCOVU0NYF2&pf_rd_s=merchandised-search-5&pf_rd_r=20MSK49RYWM4VC7ARN55&pf_rd_t=101&pf_rd_p=7c733585-9590-44ed-af48-6a6dfe851915&pf_rd_i=1896424071&th=1', 'call_back': self.parse_amazon_key},
                 ]
         for host in hosts:
             self.waiting_list.append(host['url'])
@@ -101,7 +101,7 @@ class Spider(CrawlSpider):
                 if domain in url:
                     valid_url = False
                     break
-            if (url not in self.finish_list) and ('tmall.com' in url) and ('search_product' not in url) \
+            if (url not in self.finish_list) and (url not in self.waiting_list) and ('tmall.com' in url) and ('search_product' not in url) \
                     and ('www.tmall.com' not in url) and valid_url:
                 self.waiting_list.append(url)
                 # logging.debug(' next page:----->' + url + ' waiting %s finished %s' % (len(self.waiting_list), len(self.finish_list)))
@@ -139,12 +139,17 @@ class Spider(CrawlSpider):
             selector = Selector(text=self.driver.page_source)
         except Exception as exc:
             logging.error(exc)
-            # self.driver.execute_script('window.stop()')
+            self.driver.quit()
+            self.driver = webdriver.Chrome("/Users/wulei/Downloads/chromedriver")
             pass
         # logging.info(selector)
         # divs = selector.xpath('//div[@class="tm-fcs-panel"]/dl[@class="tm-promo-panel"]/dd/div[@class="tm-promo-price"]')
         viewkey = None
+        price = 0
         if 'item.jd.com' in response.url:
+            prices = selector.css('.price::text').extract()
+            if prices and len(prices) > 0:
+                price = prices[0]
             divs = selector.css('.summary-promotion')
             for div in divs:
                 for desc in JD_DESC:
@@ -152,7 +157,7 @@ class Spider(CrawlSpider):
                     if viewkey:
                         break
         if viewkey:
-            yield self.parse_jd_info(response)
+            yield self.parse_jd_info(response, price)
         url_next = selector.xpath(
             '//*/@href').extract()
         logging.debug(len(url_next))
@@ -166,14 +171,14 @@ class Spider(CrawlSpider):
                 if domain in url:
                     valid_url = False
                     break
-            if (url not in self.finish_list) and ('jd.com' in url) and ('search_product' not in url) \
+            if (url not in self.finish_list) and (url not in self.waiting_list) and ('jd.com' in url) and ('search_product' not in url) \
                     and ('www.jd.com' not in url) and valid_url:
                 self.waiting_list.append(url)
                 # logging.debug(' next page:----->' + url + ' waiting %s finished %s' % (len(self.waiting_list), len(self.finish_list)))
                 yield Request(url=url,
                               callback=self.parse_jd_key, errback=self.parse_err)
 
-    def parse_jd_info(self, response):
+    def parse_jd_info(self, response, price):
         actItem = ActivityItem()
         selector = Selector(response)
         _ph_info = selector.xpath('//title/text()').extract()
@@ -185,7 +190,8 @@ class Spider(CrawlSpider):
         actItem['link_url'] = link_url
         actItem['website'] = 'jd'
         actItem['valid'] = True
-        logging.debug(' title:%s link_url:%s' % (title, link_url))
+        actItem['price'] = float(price)
+        logging.debug(' title:%s link_url:%s price:%s' % (title, link_url, price))
         return actItem
 
     def parse_amazon_key(self, response):
@@ -203,12 +209,17 @@ class Spider(CrawlSpider):
             selector = Selector(text=self.driver.page_source)
         except Exception as exc:
             logging.error(exc)
-            # self.driver.execute_script('window.stop()')
+            self.driver.quit()
+            self.driver = webdriver.Chrome("/Users/wulei/Downloads/chromedriver")
             pass
         # logging.info(selector)
         # divs = selector.xpath('//div[@class="tm-fcs-panel"]/dl[@class="tm-promo-panel"]/dd/div[@class="tm-promo-price"]')
         viewkey = None
+        price = 0
         if 'www.amazon.cn/gp/product' in response.url:
+            prices = selector.css('#priceblock_dealprice::text').extract()
+            if prices and len(prices) > 0:
+                price = prices[0][1:]
             divs = selector.css('.a-size-base.a-color-secondary.apl_label')
             for div in divs:
                 for desc in AMAZON_DESC:
@@ -216,7 +227,7 @@ class Spider(CrawlSpider):
                     if viewkey:
                         break
         if viewkey:
-            yield self.parse_amazon_info(response)
+            yield self.parse_amazon_info(response, price)
         url_next = selector.xpath(
             '//*/@href').extract()
         logging.debug(len(url_next))
@@ -230,13 +241,13 @@ class Spider(CrawlSpider):
                 if domain in url:
                     valid_url = False
                     break
-            if (url not in self.finish_list) and ('www.amazon.cn' in url) and valid_url:
+            if (url not in self.finish_list) and (url not in self.waiting_list) and ('www.amazon.cn' in url) and valid_url:
                 self.waiting_list.append(url)
                 # logging.debug(' next page:----->' + url + ' waiting %s finished %s' % (len(self.waiting_list), len(self.finish_list)))
                 yield Request(url=url,
                               callback=self.parse_amazon_key, errback=self.parse_err)
 
-    def parse_amazon_info(self, response):
+    def parse_amazon_info(self, response, price):
         actItem = ActivityItem()
         selector = Selector(response)
         _ph_info = selector.xpath('//title/text()').extract()
@@ -248,7 +259,8 @@ class Spider(CrawlSpider):
         actItem['link_url'] = link_url
         actItem['website'] = 'amazon'
         actItem['valid'] = True
-        logging.debug(' title:%s link_url:%s' % (title, link_url))
+        actItem['price'] = float(price)
+        logging.debug(' title:%s link_url:%s price:%s' % (title, link_url, price))
         return actItem
 
     def parse_err(self, failure):

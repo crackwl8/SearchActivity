@@ -71,6 +71,7 @@ JD_EXCEPT_DOMAIN = [
     'movie.jd.com',
     'zhaopin.jd.com',
     'jr.jd.com',
+    'surveys.jd.com',
 ]
 
 AMAZON_DESC = [
