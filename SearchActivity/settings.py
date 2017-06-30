@@ -14,9 +14,9 @@ BOT_NAME = 'SearchActivity'
 SPIDER_MODULES = ['SearchActivity.spiders']
 NEWSPIDER_MODULE = 'SearchActivity.spiders'
 
-DOWNLOAD_DELAY = 2  # 间隔时间
-# LOG_LEVEL = 'INFO'  # 日志级别
-CONCURRENT_REQUESTS = 50  # 默认为16
+DOWNLOAD_DELAY = 1  # 间隔时间
+LOG_LEVEL = 'INFO'  # 日志级别
+CONCURRENT_REQUESTS = 100  # 默认为16
 # CONCURRENT_ITEMS = 1
 # CONCURRENT_REQUESTS_PER_IP = 1
 REDIRECT_ENABLED = True
@@ -26,10 +26,13 @@ REDIRECT_ENABLED = True
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
+RETRY_ENABLED = False
+
 DOWNLOADER_MIDDLEWARES = {
     "SearchActivity.middlewares.UserAgentMiddleware": 401,
     "SearchActivity.middlewares.CookiesMiddleware": 402,
+    'SearchActivity.middlewares.JavaScriptMiddleware': 403,
 }
 ITEM_PIPELINES = {
-    "SearchActivity.pipelines.SearchActivityMongoDBPipeline": 403,
+    "SearchActivity.pipelines.SearchActivityMongoDBPipeline": 413,
 }

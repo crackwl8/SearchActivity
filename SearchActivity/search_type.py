@@ -72,6 +72,9 @@ JD_EXCEPT_DOMAIN = [
     'zhaopin.jd.com',
     'jr.jd.com',
     'surveys.jd.com',
+    'xinren.jd.com',
+    'jimi.jd.com',
+    'jimi1.jd.com',
 ]
 
 AMAZON_DESC = [
@@ -89,4 +92,6 @@ AMAZON_EXCEPT_DOMAIN = [
     'www.amazon.cn/gp/cart',
     '/uedata/unsticky/',
     'www.amazon.cn/gp/redirect.html',
+    'www.amazon.cn/kindle-dbs/hz/signup',
+    'www.amazon.cn/ap/signin',
 ]
