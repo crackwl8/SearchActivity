@@ -79,7 +79,7 @@ JD_EXCEPT_DOMAIN = [
 
 AMAZON_DESC = [
     u'促销信息',
-
+    u'You Save:',
 ]
 
 AMAZON_EXCEPT_DOMAIN = [
