@@ -49,7 +49,7 @@ class JavaScriptMiddleware(object):
             logging.error('err url:' + request.url)
             logging.error(exc)
             spider.driver.quit()
-            spider.driver = webdriver.Chrome("/usr/local/bin/chromedriver")
+            spider.driver = webdriver.Firefox()  # Chrome("/usr/local/bin/chromedriver")
             spider.driver.set_page_load_timeout(20)
             spider.driver.set_script_timeout(5)
             pass
