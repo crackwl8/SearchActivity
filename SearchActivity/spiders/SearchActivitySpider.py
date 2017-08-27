@@ -14,7 +14,7 @@ import json
 import random
 from selenium import webdriver
 
-web_driver = webdriver.Chrome("/usr/lib/chromium-browser/chromedriver")
+web_driver = webdriver.Chrome("/usr/local/bin/chromedriver")
 
 class Spider(CrawlSpider):
     name = 'searchActivitySpider'
