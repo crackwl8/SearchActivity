@@ -14,6 +14,10 @@ import json
 import random
 from selenium import webdriver
 
+from pyvirtualdisplay import Display
+
+display = Display(visible=0, size=(800, 600))
+display.start()
 web_driver = webdriver.Firefox()  # Chrome("/usr/local/bin/chromedriver")
 
 class Spider(CrawlSpider):
@@ -36,10 +40,6 @@ class Spider(CrawlSpider):
         self.driver = web_driver
         self.driver.set_page_load_timeout(20)
         self.driver.set_script_timeout(5)
-
-        from pyvirtualdisplay import Display
-        display = Display(visible=0, size=(800, 600))
-        display.start()
 
     def __del__(self):
         if self.driver is not None:
