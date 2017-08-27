@@ -37,6 +37,10 @@ class Spider(CrawlSpider):
         self.driver.set_page_load_timeout(20)
         self.driver.set_script_timeout(5)
 
+        from pyvirtualdisplay import Display
+        display = Display(visible=0, size=(800, 600))
+        display.start()
+
     def __del__(self):
         if self.driver is not None:
             self.driver.quit()
