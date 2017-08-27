@@ -22,17 +22,17 @@ web_driver = webdriver.Firefox()  # Chrome("/usr/local/bin/chromedriver")
 
 class Spider(CrawlSpider):
     name = 'searchActivitySpider'
-    allowed_domains = ['tmall.com', 'taobao.com', 'jd.com', 'amazon.cn']
+    allowed_domains = ['amazon.com', 'ebay.com', 'wish.com']
     start_urls = []
     logging.getLogger("requests").setLevel(logging.WARNING
                                           )  # 将requests的日志级别设成WARNING
-    # logging.basicConfig(
-    #     level=logging.INFO,
-    #     format=
-    #     '%(asctime)s %(filename)s[line:%(lineno)d] %(process)d %(thread)d %(levelname)s %(message)s',
-    #     datefmt='%a, %d %b %Y %H:%M:%S',
-    #     filename='cataline.log',
-    #     filemode='w')
+    logging.basicConfig(
+        level=logging.INFO,
+        format=
+        '%(asctime)s %(filename)s[line:%(lineno)d] %(process)d %(thread)d %(levelname)s %(message)s',
+        datefmt='%a, %d %b %Y %H:%M:%S',
+        filename='cataline.log',
+        filemode='w')
 
     def __init__(self):  # 初始化类
         self.waiting_list = []
