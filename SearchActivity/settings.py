@@ -29,6 +29,7 @@ ROBOTSTXT_OBEY = False
 RETRY_ENABLED = False
 
 DOWNLOADER_MIDDLEWARES = {
+    # 'SearchActivity.middlewares.ProxyMiddleware': 100,
     "SearchActivity.middlewares.UserAgentMiddleware": 401,
     "SearchActivity.middlewares.CookiesMiddleware": 402,
     'SearchActivity.middlewares.JavaScriptMiddleware': 403,

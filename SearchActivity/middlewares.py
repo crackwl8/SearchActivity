@@ -7,6 +7,19 @@ from scrapy.http import HtmlResponse
 import time
 import logging
 
+class ProxyMiddleware(object):
+    #代理IP列表
+    proxyList = [
+        '115.46.68.176:8123',
+        '222.95.20.22:808'
+        ]
+
+    def process_request(self, request, spider):
+        # Set the location of the proxy
+        pro_adr = random.choice(self.proxyList)
+        print "USE PROXY -> " + pro_adr
+        request.meta['proxy'] = "http://" + pro_adr
+
 class UserAgentMiddleware(object):
     """ 换User-Agent """
 
@@ -49,7 +62,7 @@ class JavaScriptMiddleware(object):
             logging.error('err url:' + request.url)
             logging.error(exc)
             spider.driver.quit()
-            spider.driver = webdriver.Firefox()  # Chrome("/usr/local/bin/chromedriver")
+            spider.driver = webdriver.Chrome("/usr/local/bin/chromedriver")  # Firefox()
             spider.driver.set_page_load_timeout(20)
             spider.driver.set_script_timeout(5)
             pass

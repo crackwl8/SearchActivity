@@ -18,7 +18,7 @@ from pyvirtualdisplay import Display
 
 display = Display(visible=0, size=(800, 600))
 display.start()
-web_driver = webdriver.Firefox()  # Chrome("/usr/local/bin/chromedriver")
+web_driver = webdriver.Chrome("/usr/local/bin/chromedriver")  # Firefox()
 
 class Spider(CrawlSpider):
     name = 'searchActivitySpider'
@@ -53,7 +53,7 @@ class Spider(CrawlSpider):
                  # {'url': 'https://www.amazon.cn', 'call_back': self.parse_amazon_key},
                  {'url': 'https://www.amazon.com', 'call_back': self.parse_amazon_foreign_key},
                  {'url': 'http://www.ebay.com', 'call_back': self.parse_ebay_foreign_key},
-                 {'url': 'https://www.wish.com', 'call_back': self.parse_wish_foreign_key},
+                 # {'url': 'https://www.wish.com', 'call_back': self.parse_wish_foreign_key},
                 ]
         for host in hosts:
             self.waiting_list.append(host['url'])
