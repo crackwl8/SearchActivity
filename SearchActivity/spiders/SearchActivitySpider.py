@@ -52,7 +52,7 @@ class Spider(CrawlSpider):
                  # {'url': 'https://item.jd.com', 'call_back': self.parse_jd_key},
                  # {'url': 'https://www.amazon.cn', 'call_back': self.parse_amazon_key},
                  {'url': 'https://www.amazon.com', 'call_back': self.parse_amazon_foreign_key},
-                 {'url': 'http://www.ebay.com', 'call_back': self.parse_ebay_foreign_key},
+                 {'url': 'https://www.ebay.com', 'call_back': self.parse_ebay_foreign_key},
                  # {'url': 'https://www.wish.com', 'call_back': self.parse_wish_foreign_key},
                 ]
         for host in hosts:
