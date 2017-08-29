@@ -294,20 +294,20 @@ class Spider(CrawlSpider):
             if url.startswith('//'):
                 url = 'https:' + url
             elif (not url.startswith('http')) and url.startswith('/'):
-                url = 'https://www.amazon.cn' + url
+                url = 'https://www.amazon.com' + url
             valid_url = True
             for domain in AMAZON_EXCEPT_DOMAIN:
                 if domain in url:
                     valid_url = False
                     break
-            if (url not in self.finish_list) and (url not in self.waiting_list) and ('www.amazon.cn' in url) and valid_url:
+            if (url not in self.finish_list) and (url not in self.waiting_list) and ('www.amazon.com' in url) and valid_url:
                 if len(self.waiting_list) < 1000000:
                     self.waiting_list.append(url)
                 else:
                     logging.error('too many waiting url!!!!!')
                 # logging.debug(' next page:----->' + url + ' waiting %s finished %s' % (len(self.waiting_list), len(self.finish_list)))
                 yield Request(url=url,
-                              callback=self.parse_amazon_key, errback=self.parse_err)
+                              callback=self.parse_amazon_foreign_key, errback=self.parse_err)
 
     def parse_ebay_foreign_key(self, response):
         selector = Selector(response)
@@ -344,20 +344,20 @@ class Spider(CrawlSpider):
             if url.startswith('//'):
                 url = 'https:' + url
             elif (not url.startswith('http')) and url.startswith('/'):
-                url = 'https://www.amazon.cn' + url
+                url = 'https://www.ebay.com' + url
             valid_url = True
             for domain in AMAZON_EXCEPT_DOMAIN:
                 if domain in url:
                     valid_url = False
                     break
-            if (url not in self.finish_list) and (url not in self.waiting_list) and ('www.amazon.cn' in url) and valid_url:
+            if (url not in self.finish_list) and (url not in self.waiting_list) and ('www.ebay.com' in url) and valid_url:
                 if len(self.waiting_list) < 1000000:
                     self.waiting_list.append(url)
                 else:
                     logging.error('too many waiting url!!!!!')
                 # logging.debug(' next page:----->' + url + ' waiting %s finished %s' % (len(self.waiting_list), len(self.finish_list)))
                 yield Request(url=url,
-                              callback=self.parse_amazon_key, errback=self.parse_err)
+                              callback=self.parse_ebay_foreign_key, errback=self.parse_err)
 
     def parse_wish_foreign_key(self, response):
         selector = Selector(response)
