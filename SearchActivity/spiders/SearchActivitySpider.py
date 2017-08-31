@@ -23,6 +23,7 @@ display = Display(visible=0, size=(800, 600))
 display.start()
 web_driver = webdriver.Chrome("/usr/local/bin/chromedriver")  # Firefox()
 
+
 class Spider(CrawlSpider):
     name = 'searchActivitySpider'
     allowed_domains = ['amazon.com', 'ebay.com', 'wish.com']
@@ -70,7 +71,7 @@ class Spider(CrawlSpider):
                               callback=host['call_back'], errback=self.parse_err)
         else:
             logging.info('redis waiting 2')
-            self.process_one_redis_waiting()
+            self.process_one_redis_waiting(self)
 
     def process_one_redis_waiting(self):
         logging.info('redis waiting 3')
