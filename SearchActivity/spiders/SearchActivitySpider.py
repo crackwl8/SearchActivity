@@ -64,7 +64,6 @@ class Spider(CrawlSpider):
         logging.info('Waiting list len %s' % self.r.scard('waiting'))  # 获取waiting list len
         if self.r.scard('waiting') == 0:
             logging.info('redis waiting 0')
-            self.r.sadd('waiting', 'xx')
             for host in hosts:
                 self.waiting_list.append(host['url'])
                 yield Request(url='%s' % (host['url']),
@@ -88,9 +87,6 @@ class Spider(CrawlSpider):
 
     def process_one_redis_waiting(self):
         logging.info('redis waiting 3')
-        if self.r.scard('waiting') == 0:
-            logging.info('redis waiting list empty')
-            return
 
         try:
             first = self.r.spop("waiting")
