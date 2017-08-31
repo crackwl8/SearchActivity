@@ -12,6 +12,7 @@ from twisted.internet.error import TimeoutError, TCPTimedOutError
 import re
 import json
 import random
+import redis
 from selenium import webdriver
 
 from pyvirtualdisplay import Display
@@ -26,6 +27,8 @@ class Spider(CrawlSpider):
     name = 'searchActivitySpider'
     allowed_domains = ['amazon.com', 'ebay.com', 'wish.com']
     start_urls = []
+    r = redis.Redis(host=REDIS_SERVER, port=6379, db=0)
+
     logging.getLogger("requests").setLevel(logging.WARNING
                                           )  # 将requests的日志级别设成WARNING
     logging.basicConfig(
@@ -57,14 +60,29 @@ class Spider(CrawlSpider):
                  {'url': 'https://www.ebay.com', 'call_back': self.parse_ebay_foreign_key},
                  # {'url': 'https://www.wish.com', 'call_back': self.parse_wish_foreign_key},
                 ]
-        import redis
 
-        r = redis.Redis(host=REDIS_SERVER, port=6379, db=0)
-        logging.info('Waiting list len %s' % r.llen('waiting'))  # 获取waiting list len
-        for host in hosts:
-            self.waiting_list.append(host['url'])
-            yield Request(url='%s' % (host['url']),
-                          callback=host['call_back'], errback=self.parse_err)
+        logging.info('Waiting list len %s' % self.r.llen('waiting'))  # 获取waiting list len
+        if self.r.scard('waiting') == 0:
+            self.r.sadd('waiting', 'xx')
+            for host in hosts:
+                self.waiting_list.append(host['url'])
+                yield Request(url='%s' % (host['url']),
+                              callback=host['call_back'], errback=self.parse_err)
+        else:
+            self.process_one_redis_waiting()
+
+    def process_one_redis_waiting(self):
+        if self.r.scard('waiting') == 0:
+            return
+        first = self.r.spop("waiting")
+        if ('amazon.com' in first):
+            yield Request(url=first,
+                          callback=self.parse_amazon_foreign_key, errback=self.parse_err)
+        elif ('ebay.com' in first):
+            yield Request(url=first,
+                          callback=self.parse_ebay_foreign_key, errback=self.parse_err)
+        else:
+            self.process_one_redis_waiting()
 
     def parse_tmall_key(self, response):
         selector = Selector(response)
@@ -309,11 +327,12 @@ class Spider(CrawlSpider):
             if (url not in self.finish_list) and (url not in self.waiting_list) and ('www.amazon.com' in url) and valid_url:
                 if len(self.waiting_list) < 1000000:
                     self.waiting_list.append(url)
+                    self.r.sadd('waiting', url)
                 else:
                     logging.error('too many waiting url!!!!!')
                 # logging.debug(' next page:----->' + url + ' waiting %s finished %s' % (len(self.waiting_list), len(self.finish_list)))
-                yield Request(url=url,
-                              callback=self.parse_amazon_foreign_key, errback=self.parse_err)
+        for i in range(1, 10):
+            self.process_one_redis_waiting()
 
     def parse_ebay_foreign_key(self, response):
         selector = Selector(response)
@@ -359,11 +378,12 @@ class Spider(CrawlSpider):
             if (url not in self.finish_list) and (url not in self.waiting_list) and ('www.ebay.com' in url) and valid_url:
                 if len(self.waiting_list) < 1000000:
                     self.waiting_list.append(url)
+                    self.r.sadd('waiting', url)
                 else:
                     logging.error('too many waiting url!!!!!')
                 # logging.debug(' next page:----->' + url + ' waiting %s finished %s' % (len(self.waiting_list), len(self.finish_list)))
-                yield Request(url=url,
-                              callback=self.parse_ebay_foreign_key, errback=self.parse_err)
+        for i in range(1, 10):
+            self.process_one_redis_waiting()
 
     def parse_wish_foreign_key(self, response):
         selector = Selector(response)
