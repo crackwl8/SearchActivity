@@ -16,7 +16,7 @@ from selenium import webdriver
 
 from pyvirtualdisplay import Display
 
-REDIS_SERVER = '34.210.176.152'
+REDIS_SERVER = '172.31.47.195'
 
 display = Display(visible=0, size=(800, 600))
 display.start()
