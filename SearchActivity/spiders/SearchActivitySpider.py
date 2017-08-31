@@ -61,7 +61,7 @@ class Spider(CrawlSpider):
                  # {'url': 'https://www.wish.com', 'call_back': self.parse_wish_foreign_key},
                 ]
 
-        logging.info('Waiting list len %s' % self.r.llen('waiting'))  # 获取waiting list len
+        logging.info('Waiting list len %s' % self.r.scard('waiting'))  # 获取waiting list len
         if self.r.scard('waiting') == 0:
             self.r.sadd('waiting', 'xx')
             for host in hosts:
