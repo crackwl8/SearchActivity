@@ -75,12 +75,16 @@ class Spider(CrawlSpider):
         if self.r.scard('waiting') == 0:
             logging.info('redis waiting list empty')
             return
-        first = self.r.spop("waiting")
-        logging.info('process %s' % first)
-        if 'amazon.com' in first:
+        first = ''
+        try:
+            first = self.r.spop("waiting")
+            logging.info('process %s' % first)
+        except Exception as exc:
+            logging.error('spop fail: %s' % exc)
+        if first and 'amazon.com' in first:
             yield Request(url=first,
                           callback=self.parse_amazon_foreign_key, errback=self.parse_err)
-        elif 'ebay.com' in first:
+        elif first and 'ebay.com' in first:
             yield Request(url=first,
                           callback=self.parse_ebay_foreign_key, errback=self.parse_err)
         else:
