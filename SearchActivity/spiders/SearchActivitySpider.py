@@ -71,7 +71,10 @@ class Spider(CrawlSpider):
                               callback=host['call_back'], errback=self.parse_err)
         else:
             logging.info('redis waiting 2')
-            self.process_one_redis_waiting(self)
+            try:
+                self.process_one_redis_waiting()
+            except Exception as exc:
+                logging.error('process_one_redis_waiting fail: %s' % exc)
 
     def process_one_redis_waiting(self):
         logging.info('redis waiting 3')
