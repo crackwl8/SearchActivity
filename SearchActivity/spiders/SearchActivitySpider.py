@@ -16,6 +16,8 @@ from selenium import webdriver
 
 from pyvirtualdisplay import Display
 
+REDIS_SERVER = '34.210.176.152'
+
 display = Display(visible=0, size=(800, 600))
 display.start()
 web_driver = webdriver.Chrome("/usr/local/bin/chromedriver")  # Firefox()
@@ -55,6 +57,10 @@ class Spider(CrawlSpider):
                  {'url': 'https://www.ebay.com', 'call_back': self.parse_ebay_foreign_key},
                  # {'url': 'https://www.wish.com', 'call_back': self.parse_wish_foreign_key},
                 ]
+        import redis
+
+        r = redis.Redis(host=REDIS_SERVER, port=6379, db=0)
+        logging.info('Waiting list len %s' % r.llen('waiting'))  # 获取waiting list len
         for host in hosts:
             self.waiting_list.append(host['url'])
             yield Request(url='%s' % (host['url']),
