@@ -73,12 +73,14 @@ class Spider(CrawlSpider):
 
     def process_one_redis_waiting(self):
         if self.r.scard('waiting') == 0:
+            logging.info('redis waiting list empty')
             return
         first = self.r.spop("waiting")
-        if ('amazon.com' in first):
+        logging.info('process %s' % first)
+        if 'amazon.com' in first:
             yield Request(url=first,
                           callback=self.parse_amazon_foreign_key, errback=self.parse_err)
-        elif ('ebay.com' in first):
+        elif 'ebay.com' in first:
             yield Request(url=first,
                           callback=self.parse_ebay_foreign_key, errback=self.parse_err)
         else:
@@ -450,4 +452,5 @@ class Spider(CrawlSpider):
                 # logging.debug(self.waiting_list)
                 pass
             self.finish_list.append(url)
+            self.process_one_redis_waiting()
         logging.debug('request url err callback:------>' + url + ' waiting %s finished %s' % (len(self.waiting_list), len(self.finish_list)))
