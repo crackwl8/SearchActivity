@@ -71,10 +71,14 @@ class Spider(CrawlSpider):
                               callback=host['call_back'], errback=self.parse_err)
         else:
             logging.info('redis waiting 2')
-            try:
-                self.process_one_redis_waiting()
-            except Exception as exc:
-                logging.error('process_one_redis_waiting fail: %s' % exc)
+            first = self.r.spop("waiting")
+            logging.info('process %s' % first)
+            if first and ('amazon.com' in first):
+                yield Request(url=first,
+                              callback=self.parse_amazon_foreign_key, errback=self.parse_err)
+            elif first and ('ebay.com' in first):
+                yield Request(url=first,
+                              callback=self.parse_ebay_foreign_key, errback=self.parse_err)
 
     def process_one_redis_waiting(self):
         logging.info('redis waiting 3')
@@ -340,7 +344,14 @@ class Spider(CrawlSpider):
                     logging.error('too many waiting url!!!!!')
                 # logging.debug(' next page:----->' + url + ' waiting %s finished %s' % (len(self.waiting_list), len(self.finish_list)))
         for i in range(1, 10):
-            self.process_one_redis_waiting()
+            first = self.r.spop("waiting")
+            logging.info('process %s' % first)
+            if first and ('amazon.com' in first):
+                yield Request(url=first,
+                              callback=self.parse_amazon_foreign_key, errback=self.parse_err)
+            elif first and ('ebay.com' in first):
+                yield Request(url=first,
+                              callback=self.parse_ebay_foreign_key, errback=self.parse_err)
 
     def parse_ebay_foreign_key(self, response):
         selector = Selector(response)
@@ -391,7 +402,14 @@ class Spider(CrawlSpider):
                     logging.error('too many waiting url!!!!!')
                 # logging.debug(' next page:----->' + url + ' waiting %s finished %s' % (len(self.waiting_list), len(self.finish_list)))
         for i in range(1, 10):
-            self.process_one_redis_waiting()
+            first = self.r.spop("waiting")
+            logging.info('process %s' % first)
+            if first and ('amazon.com' in first):
+                yield Request(url=first,
+                              callback=self.parse_amazon_foreign_key, errback=self.parse_err)
+            elif first and ('ebay.com' in first):
+                yield Request(url=first,
+                              callback=self.parse_ebay_foreign_key, errback=self.parse_err)
 
     def parse_wish_foreign_key(self, response):
         selector = Selector(response)
