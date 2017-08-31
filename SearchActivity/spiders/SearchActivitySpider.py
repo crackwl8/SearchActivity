@@ -88,8 +88,6 @@ class Spider(CrawlSpider):
             elif first and ('ebay.com' in first):
                 yield Request(url=first,
                               callback=self.parse_ebay_foreign_key, errback=self.parse_err)
-            else:
-                self.process_one_redis_waiting()
         except Exception as exc:
             logging.error('spop fail: %s' % exc)
 
