@@ -70,20 +70,7 @@ class Spider(CrawlSpider):
                               callback=host['call_back'], errback=self.parse_err)
         else:
             logging.info('redis waiting 2')
-            # self.process_one_redis_waiting()
-            try:
-                first = self.r.spop("waiting")
-                logging.info('process %s' % first)
-                if first and ('amazon.com' in first):
-                    yield Request(url=first,
-                                  callback=self.parse_amazon_foreign_key, errback=self.parse_err)
-                elif first and ('ebay.com' in first):
-                    yield Request(url=first,
-                                  callback=self.parse_ebay_foreign_key, errback=self.parse_err)
-                else:
-                    self.process_one_redis_waiting()
-            except Exception as exc:
-                logging.error('spop fail: %s' % exc)
+            self.process_one_redis_waiting()
 
     def process_one_redis_waiting(self):
         logging.info('redis waiting 3')
